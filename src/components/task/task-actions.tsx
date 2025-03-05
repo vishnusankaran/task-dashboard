@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 export function TaskActions({
   handleChange,
 }: {
-  handleChange: (action: string) => void;
+  handleChange: (event: React.MouseEvent, action: string) => void;
 }) {
   return (
     <DropdownMenu>
@@ -22,16 +22,16 @@ export function TaskActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleChange("view")}>
+        {/* <DropdownMenuItem onClick={(e) => handleChange(e, "view")}>
           <EyeIcon />
           View
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleChange("edit")}>
+        </DropdownMenuItem> */}
+        <DropdownMenuItem onClick={() => handleChange(e, "edit")}>
           <PencilLine />
           Edit
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleChange("delete")}>
+        <DropdownMenuItem onClick={() => handleChange(e, "delete")}>
           <Trash2 />
           Delete
         </DropdownMenuItem>

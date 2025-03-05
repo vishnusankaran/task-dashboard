@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { TaskListing } from "@/components/task/listing";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { UserProvider } from "@/provider/user-provider";
+import { UserProvider } from "@/provider/user";
 
 export default function App() {
   return (
@@ -10,7 +10,7 @@ export default function App() {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <div className="flex w-full">
+          <div className="flex w-full border-b">
             <AppHeader />
           </div>
           <div className="flex flex-1 flex-col p-4 pt-0">

@@ -94,7 +94,13 @@ export const columns: ColumnDef<Task>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      return <TaskActions handleChange={() => {}} />;
+      return (
+        <TaskActions
+          handleChange={(e) => {
+            e.stopPropogation();
+          }}
+        />
+      );
     },
     size: 32,
   },
