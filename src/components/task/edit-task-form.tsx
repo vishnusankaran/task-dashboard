@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
+import { useMutation } from "urql";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -35,6 +35,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Task } from "@/types";
+import { updateSingleTask } from "@/queries/tasks";
+import { TaskContext } from "@/context/task";
 
 const statuses = ["pending", "in-progress", "completed"] as const;
 
@@ -57,12 +59,13 @@ const formSchema = z.object({
     })
     .optional(),
   status: statusEnum,
-  dueDate: z.date().refine((data) => data > new Date(), {
-    message: "Date must be in the future",
-  }),
+  dueDate: z.date(),
 });
 
 export const EditTaskForm = (props: Task) => {
+  const { setActiveTask, result, fetchTasks } = React.useContext(TaskContext);
+  const [_, updateTask] = useMutation(updateSingleTask);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -77,10 +80,22 @@ export const EditTaskForm = (props: Task) => {
     form.reset(props);
   }, [form, props]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    await updateTask({
+      set: {
+        ...values,
+      },
+      where: {
+        id: {
+          eq: props.id,
+        },
+      },
+    });
+
+    fetchTasks({ requestPolicy: "network-only" });
+    setActiveTask({ ...props, ...values });
   };
 
   return (
@@ -98,7 +113,6 @@ export const EditTaskForm = (props: Task) => {
                   autoFocus
                   placeholder="What do you want to call the task.."
                   {...field}
-                  value={props.title}
                 />
               </FormControl>
               <FormMessage className="text-xs" />
@@ -117,7 +131,6 @@ export const EditTaskForm = (props: Task) => {
                   className="min-h-32 bg-background"
                   placeholder="Describe the task in detail.."
                   {...field}
-                  value={props.description}
                 />
               </FormControl>
               <FormMessage className="text-xs" />
@@ -142,11 +155,7 @@ export const EditTaskForm = (props: Task) => {
                       )}
                     >
                       <CalendarIcon />
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {format(field.value, "PPP")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -181,8 +190,12 @@ export const EditTaskForm = (props: Task) => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Status</SelectLabel>
-                      {statuses.map((status) => (
-                        <SelectItem className="cursor-pointer" value={status}>
+                      {statuses.map((status, idx) => (
+                        <SelectItem
+                          key={idx}
+                          className="cursor-pointer"
+                          value={status}
+                        >
                           {status}
                         </SelectItem>
                       ))}
@@ -195,7 +208,11 @@ export const EditTaskForm = (props: Task) => {
           )}
         />
 
-        <Button type="submit" className="w-full">
+        <Button
+          disabled={result.fetching}
+          type="submit"
+          className={`w-full ${result.fetching ? "animate-pulse" : ""}`}
+        >
           Save
         </Button>
       </form>

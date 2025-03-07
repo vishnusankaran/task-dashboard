@@ -16,7 +16,7 @@ export function DeleteTaskDialog({
   onDelete,
 }: {
   children: React.ReactNode;
-  onDelete: () => void;
+  onDelete: (e: MouseEvent) => void;
 }) {
   return (
     <AlertDialog>

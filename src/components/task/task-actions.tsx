@@ -1,18 +1,27 @@
-import { MoreHorizontal, Trash2, EyeIcon, PencilLine } from "lucide-react";
+import * as React from "react";
+import { MoreHorizontal, Trash2 } from "lucide-react";
+import { useMutation } from "urql";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { DeleteTaskDialog } from "@/components/task/delete-task-dialog";
+import { deleteSingleTask } from "@/queries/tasks";
+import { TaskContext } from "@/context/task";
 
 export function TaskActions({
+  id,
   handleChange,
 }: {
+  id: string;
   handleChange: (event: React.MouseEvent, action: string) => void;
 }) {
+  const { fetchTasks } = React.useContext(TaskContext);
+  const [_, deleteTask] = useMutation(deleteSingleTask);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -21,19 +30,30 @@ export function TaskActions({
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {/* <DropdownMenuItem onClick={(e) => handleChange(e, "view")}>
-          <EyeIcon />
-          View
-        </DropdownMenuItem> */}
-        <DropdownMenuItem onClick={() => handleChange(e, "edit")}>
-          <PencilLine />
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleChange(e, "delete")}>
-          <Trash2 />
-          Delete
+      <DropdownMenuContent
+        align="end"
+        onClick={(e) => handleChange(e, "delete")}
+      >
+        <DropdownMenuItem className="cursor-pointer">
+          <DeleteTaskDialog
+            onDelete={async (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              await deleteTask({
+                where: {
+                  id: {
+                    eq: id,
+                  },
+                },
+              });
+              fetchTasks({ requestPolicy: "network-only" });
+            }}
+          >
+            <Button size="xs" variant={"ghost"}>
+              <Trash2 size="sm" />
+              Delete
+            </Button>
+          </DeleteTaskDialog>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

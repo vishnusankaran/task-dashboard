@@ -9,13 +9,19 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { TaskContext } from "@/context/task";
 import { Button } from "@/components/ui/button";
 import { AddTaskForm } from "@/components/task/add-task-form";
 
 export function AddTaskDrawer({ children }: { children: React.ReactNode }) {
+  const { fetchTasks } = React.useContext(TaskContext);
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Drawer>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
+    <Drawer open={open}>
+      <DrawerTrigger onClick={() => setOpen(true)} asChild>
+        {children}
+      </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
@@ -24,11 +30,21 @@ export function AddTaskDrawer({ children }: { children: React.ReactNode }) {
           </DrawerHeader>
           <div className="p-4 pb-0">
             <div className="flex items-center justify-center space-x-2">
-              <AddTaskForm />
+              <AddTaskForm
+                onDone={() => {
+                  setOpen(false);
+                  fetchTasks({ requestPolicy: "network-only" });
+                }}
+              />
             </div>
           </div>
           <DrawerFooter>
-            <DrawerClose asChild>
+            <DrawerClose
+              onClick={() => {
+                setOpen(false);
+              }}
+              asChild
+            >
               <Button variant="outline">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>

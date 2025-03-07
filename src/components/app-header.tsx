@@ -1,20 +1,28 @@
 import * as React from "react";
+import { useLocation } from "react-router";
 
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AddTaskDrawer } from "@/components/task/add-task-drawer";
+import { TaskContext } from "@/context/task";
+import { StatusFilterContext } from "@/context/filter";
 
 // Add type at the top
-type StatusRecord = Record<string, boolean>;
 type StatusType = "pending" | "in-progress" | "completed";
-const statuses: StatusType[] = ["pending", "in-progress", "completed"];
+const allStatuses: StatusType[] = ["pending", "in-progress", "completed"];
 
 export function AppHeader() {
-  const [selectedStatuses, setSelectedStatuses] = React.useState<StatusRecord>(
-    {},
-  );
+  const location = useLocation();
+  const { tasks, fetchTasks, result } = React.useContext(TaskContext);
+  const { statuses, addStatusFilter, removeStatusFilter } =
+    React.useContext(StatusFilterContext);
+
+  const updatedStatuses = allStatuses.map((status) => ({
+    status,
+    count: tasks.filter((task) => task.status === status).length,
+  }));
 
   return (
     <header className="flex h-16 w-full grow gap-2 px-2 py-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -23,22 +31,41 @@ export function AppHeader() {
         <Separator orientation="vertical" className="mr-2" />
 
         <div className="flex w-full gap-4">
-          <div className="flex gap-1">
-            {statuses.map((status) => (
-              <Button
-                variant={`${selectedStatuses[status] ? status : "outline"}`}
-                onClick={() => {
-                  setSelectedStatuses({
-                    ...selectedStatuses,
-                    [status]: !selectedStatuses[status],
-                  });
-                }}
-              >
-                {status} - 2
-              </Button>
-            ))}
+          <div className="flex items-center gap-1">
+            {!["/pending", "/in-progress", "/completed"].includes(
+              location.pathname,
+            ) ? (
+              updatedStatuses.map(({ status, count }, idx) => (
+                <Button
+                  key={idx}
+                  variant={`${statuses[status] ? status : "outline"}`}
+                  onClick={() => {
+                    if (!statuses[status]) {
+                      addStatusFilter(status);
+                    } else {
+                      removeStatusFilter(status);
+                    }
+                  }}
+                >
+                  {count} {status}
+                </Button>
+              ))
+            ) : (
+              <span className="capitalize">
+                {location.pathname.split("/")[1]}
+              </span>
+            )}
           </div>
           <div className="flex grow-1"></div>
+
+          <Button
+            variant="ghost"
+            onClick={() => fetchTasks({ requestPolicy: "network-only" })}
+            className={`${result?.fetching ? "animate-spin" : ""}`}
+            disabled={result?.fetching}
+          >
+            <RefreshCw />
+          </Button>
           <AddTaskDrawer>
             <Button>
               <Plus />

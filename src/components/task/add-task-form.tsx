@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { gql, useMutation } from "urql";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +25,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+import { toast } from "sonner";
+import { addNewTask } from "@/queries/tasks";
 
 const statusEnum = z.enum(["pending", "in-progress", "completed"]);
 
@@ -45,12 +48,10 @@ const formSchema = z.object({
     })
     .optional(),
   status: statusEnum,
-  dueDate: z.date().refine((data) => data > new Date(), {
-    message: "Date must be in the future",
-  }),
+  dueDate: z.date(),
 });
 
-export const AddTaskForm = () => {
+export const AddTaskForm = ({ onDone }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,10 +62,17 @@ export const AddTaskForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const [_, addTask] = useMutation(addNewTask);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const response = await addTask({
+      values: [{ ...values, id: crypto.randomUUID() }],
+    });
+
+    toast("Task added", {
+      description: values?.title,
+    });
+    onDone(response);
   };
 
   return (

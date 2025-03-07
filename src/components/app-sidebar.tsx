@@ -37,11 +37,13 @@ const data = {
       items: [
         {
           title: "All Tasks",
-          url: "#",
+          url: "/",
+          isActive: true,
         },
         {
           title: "Completed Tasks",
-          url: "#",
+          url: "/completed",
+          isActive: true,
         },
       ],
     },

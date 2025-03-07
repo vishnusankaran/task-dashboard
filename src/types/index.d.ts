@@ -1,3 +1,5 @@
+export type TaskArray = Task[] | [];
+
 export type User = {
   id: string;
   name: string;

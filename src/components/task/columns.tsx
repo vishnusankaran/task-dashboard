@@ -2,35 +2,41 @@ import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { TaskActions } from "@/components/task/task-actions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { UserAvatar } from "@/components/task/user-avatar";
 import type { Task, User } from "@/types";
 
 export const columns: ColumnDef<Task>[] = [
   {
-    id: "select",
+    accessorKey: "status",
     header: "",
-    // header: ({ table }) => (
-    //   <Checkbox
-    //     checked={
-    //       table.getIsAllPageRowsSelected() ||
-    //       (table.getIsSomePageRowsSelected() && "indeterminate")
-    //     }
-    //     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //     aria-label="Select all"
-    //   />
-    // ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant={row.getValue("status")}
+            className="flex h-5 w-5 items-center justify-center rounded-full"
+          >
+            {" "}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>{row.getValue("status")}</p>
+        </TooltipContent>
+      </Tooltip>
     ),
-    enableSorting: false,
-    enableHiding: false,
     size: 24,
+    filterFn: (row, columnId, filterValues) => {
+      // If no filter values are selected, show all rows
+      if (!filterValues.length) return true;
+
+      // Check if the row's value is in the array of selected filter values
+      return filterValues.includes(row.getValue(columnId));
+    },
   },
   {
     accessorKey: "user",
@@ -38,7 +44,20 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const user: User = row.getValue("user");
 
-      return <UserAvatar user={user} />;
+      return (
+        typeof user === "object" && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <UserAvatar user={user} />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{user?.name}</p>
+            </TooltipContent>
+          </Tooltip>
+        )
+      );
     },
     size: 24,
   },
@@ -48,7 +67,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => (
       <div className="text-sm capitalize">{row.getValue("title")}</div>
     ),
-    size: 400,
+    size: 0,
   },
   {
     accessorKey: "description",
@@ -57,14 +76,6 @@ export const columns: ColumnDef<Task>[] = [
       <div className="capitalize">{row.getValue("description")}</div>
     ),
     size: 0,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge variant={row.getValue("status")}>{row.getValue("status")}</Badge>
-    ),
-    size: 100,
   },
   {
     accessorKey: "dueDate",
@@ -89,19 +100,5 @@ export const columns: ColumnDef<Task>[] = [
       </div>
     ),
     size: 100,
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <TaskActions
-          handleChange={(e) => {
-            e.stopPropogation();
-          }}
-        />
-      );
-    },
-    size: 32,
   },
 ];
