@@ -2,13 +2,17 @@ import * as React from "react";
 import { useMutation } from "urql";
 import { Button } from "@/components/ui/button";
 import { SquareChevronRight, Trash2 } from "lucide-react";
-import { EditTaskForm } from "@/components/task/edit-task-form";
-import { DeleteTaskDialog } from "@/components/task/delete-task-dialog";
+import { EditTaskForm } from "@/components/task/edit-form";
+import { DeleteTaskDialog } from "@/components/task/delete-dialog";
 import { User } from "@/components/task/user";
 import { TaskContext } from "@/context/task";
 import { deleteSingleTask } from "@/queries/tasks";
 
-export const TaskDetails = React.memo(function ({ handleCollapse }) {
+export const TaskDetails = React.memo(function ({
+  handleCollapse,
+}: {
+  handleCollapse: () => void;
+}) {
   const { fetchTasks, activeTask } = React.useContext(TaskContext);
   const [_, deleteTask] = useMutation(deleteSingleTask);
 

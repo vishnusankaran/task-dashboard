@@ -1,16 +1,17 @@
 import * as React from "react";
 import { useLocation } from "react-router";
-
 import { Plus, RefreshCw } from "lucide-react";
+
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { AddTaskDrawer } from "@/components/task/add-task-drawer";
+import { AddDrawer } from "@/components/task/add-drawer";
+
 import { TaskContext } from "@/context/task";
 import { StatusFilterContext } from "@/context/filter";
 
-// Add type at the top
-type StatusType = "pending" | "in-progress" | "completed";
+import { StatusType } from "@/types";
+
 const allStatuses: StatusType[] = ["pending", "in-progress", "completed"];
 
 export function AppHeader() {
@@ -52,7 +53,7 @@ export function AppHeader() {
               ))
             ) : (
               <span className="capitalize">
-                {location.pathname.split("/")[1]}
+                {location.pathname.split("/")[1]} Tasks
               </span>
             )}
           </div>
@@ -66,12 +67,12 @@ export function AppHeader() {
           >
             <RefreshCw />
           </Button>
-          <AddTaskDrawer>
+          <AddDrawer>
             <Button>
               <Plus />
               Add Task
             </Button>
-          </AddTaskDrawer>
+          </AddDrawer>
         </div>
       </div>
     </header>

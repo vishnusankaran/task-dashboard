@@ -8,16 +8,18 @@ export const getAllTasks = gql`
       dueDate
       description
       status
+      user
     }
   }
 `;
 
 export const addNewTask = gql`
-  mutation AddTask($values: [TaskInsertInput!]!) {
+  mutation addNewTask($values: [TaskInsertInput!]!) {
     insertIntoTask(values: $values) {
       id
       title
       description
+      dueDate
       status
       user
     }
@@ -30,6 +32,7 @@ export const updateSingleTask = gql`
       id
       title
       description
+      dueDate
       status
       user
     }

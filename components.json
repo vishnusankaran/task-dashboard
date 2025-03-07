@@ -16,9 +16,10 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks",
-    "mocks": "@/mocks",
     "provider": "@/provider",
-    "context": "@/context"
+    "context": "@/context",
+    "queries": "@/queries",
+    "types": "@/types"
   },
   "iconLibrary": "lucide"
 }

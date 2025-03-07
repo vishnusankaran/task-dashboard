@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/drawer";
 import { TaskContext } from "@/context/task";
 import { Button } from "@/components/ui/button";
-import { AddTaskForm } from "@/components/task/add-task-form";
+import { AddForm } from "@/components/task/add-form";
 
-export function AddTaskDrawer({ children }: { children: React.ReactNode }) {
+export function AddDrawer({ children }: { children: React.ReactNode }) {
   const { fetchTasks } = React.useContext(TaskContext);
   const [open, setOpen] = React.useState(false);
 
@@ -30,7 +30,7 @@ export function AddTaskDrawer({ children }: { children: React.ReactNode }) {
           </DrawerHeader>
           <div className="p-4 pb-0">
             <div className="flex items-center justify-center space-x-2">
-              <AddTaskForm
+              <AddForm
                 onDone={() => {
                   setOpen(false);
                   fetchTasks({ requestPolicy: "network-only" });

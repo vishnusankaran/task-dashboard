@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { columns } from "./columns";
 import type { Task } from "@/types";
-import { AddTaskDrawer } from "@/components/task/add-task-drawer";
+import { AddDrawer } from "@/components/task/add-drawer";
 import { TaskDetails } from "@/components/task/details";
 
 import { StatusFilterContext } from "@/context/filter";
@@ -201,12 +201,12 @@ export function TaskListing() {
               </div>
             ) : (
               <div className="flex-1 text-center text-sm text-muted-foreground">
-                <AddTaskDrawer>
+                <AddDrawer>
                   <Button variant="outline">
                     <Plus />
                     Add a new task
                   </Button>
-                </AddTaskDrawer>
+                </AddDrawer>
               </div>
             )}
 

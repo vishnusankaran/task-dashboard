@@ -7,11 +7,13 @@ export type User = {
   email: string;
 };
 
+export type StatusType = "pending" | "in-progress" | "completed";
+
 export type Task = {
   id: string;
   title: string;
   description?: string;
   dueDate: Date;
-  status: "pending" | "in-progress" | "completed";
+  status: StatusType;
   user: User;
 };

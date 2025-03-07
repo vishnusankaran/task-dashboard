@@ -15,7 +15,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
@@ -68,7 +67,6 @@ export function NavMain({
                       >
                         {subItem.title}
                       </NavLink>
-                      {/* </SidebarMenuSubButton> */}
                     </SidebarMenuSubItem>
                   ))}
                 </SidebarMenuSub>

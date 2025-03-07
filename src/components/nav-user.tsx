@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+
 import type { User } from "@/types";
 
 export function NavUser({ user }: { user: User }) {

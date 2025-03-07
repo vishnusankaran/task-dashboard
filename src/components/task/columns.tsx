@@ -73,7 +73,7 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("description")}</div>
+      <div className="text-sm capitalize">{row.getValue("description")}</div>
     ),
     size: 0,
   },

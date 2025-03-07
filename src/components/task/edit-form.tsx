@@ -5,8 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { gql, useMutation } from "urql";
-
+import { useMutation } from "urql";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,18 +17,30 @@ import {
 import {
   Form,
   FormControl,
+  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import type { Task } from "@/types";
+import { updateSingleTask } from "@/queries/tasks";
+import { TaskContext } from "@/context/task";
 
-import { toast } from "sonner";
-import { addNewTask } from "@/queries/tasks";
+const statuses = ["pending", "in-progress", "completed"] as const;
 
-const statusEnum = z.enum(["pending", "in-progress", "completed"]);
+const statusEnum = z.enum(statuses);
 
 const formSchema = z.object({
   title: z
@@ -51,33 +62,46 @@ const formSchema = z.object({
   dueDate: z.date(),
 });
 
-export const AddTaskForm = ({ onDone }) => {
+export const EditTaskForm = (props: Task) => {
+  const { setActiveTask, result, fetchTasks } = React.useContext(TaskContext);
+  const [_, updateTask] = useMutation(updateSingleTask);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      status: "pending",
-      dueDate: new Date(),
+      title: props.title,
+      description: props.description,
+      status: props.status,
+      dueDate: props.dueDate,
     },
   });
 
-  const [_, addTask] = useMutation(addNewTask);
+  React.useEffect(() => {
+    form.reset(props);
+  }, [form, props]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const response = await addTask({
-      values: [{ ...values, id: crypto.randomUUID() }],
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    await updateTask({
+      set: {
+        ...values,
+        dueDate: values.dueDate.toISOString(),
+      },
+      where: {
+        id: {
+          eq: props.id,
+        },
+      },
     });
 
-    toast("Task added", {
-      description: values?.title,
-    });
-    onDone(response);
+    fetchTasks({ requestPolicy: "network-only" });
+    setActiveTask({ ...props, ...values });
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -86,6 +110,7 @@ export const AddTaskForm = ({ onDone }) => {
               <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input
+                  className="bg-background"
                   autoFocus
                   placeholder="What do you want to call the task.."
                   {...field}
@@ -104,7 +129,7 @@ export const AddTaskForm = ({ onDone }) => {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  className="min-h-32"
+                  className="min-h-32 bg-background"
                   placeholder="Describe the task in detail.."
                   {...field}
                 />
@@ -131,11 +156,7 @@ export const AddTaskForm = ({ onDone }) => {
                       )}
                     >
                       <CalendarIcon />
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {format(field.value, "PPP")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -153,8 +174,47 @@ export const AddTaskForm = ({ onDone }) => {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Add
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="w-full cursor-pointer bg-background">
+                    <SelectValue placeholder="Update Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Status</SelectLabel>
+                      {statuses.map((status, idx) => (
+                        <SelectItem
+                          key={idx}
+                          className="cursor-pointer"
+                          value={status}
+                        >
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          disabled={result.fetching}
+          type="submit"
+          className={`w-full ${result.fetching ? "animate-pulse" : ""}`}
+        >
+          Save
         </Button>
       </form>
     </Form>
