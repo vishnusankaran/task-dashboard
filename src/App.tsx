@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { TaskListing } from "@/components/task/listing";
+import { EisenhowerMatrix } from "@/components/task/eisenhower-matrix";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +32,23 @@ export default function App() {
                         </div>
                         <div className="flex flex-1 flex-col p-4 pt-0">
                           <TaskListing />
+                        </div>
+                      </SidebarInset>
+                      <Toaster />
+                    </SidebarProvider>
+                  }
+                />
+                <Route
+                  path="/matrix"
+                  element={
+                    <SidebarProvider>
+                      <AppSidebar />
+                      <SidebarInset>
+                        <div className="flex w-full border-b">
+                          <AppHeader />
+                        </div>
+                        <div className="flex flex-1 flex-col p-4 pt-0">
+                          <EisenhowerMatrix />
                         </div>
                       </SidebarInset>
                       <Toaster />

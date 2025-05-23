@@ -16,17 +16,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const updatedTasks = result?.data?.task?.map(
-      ({ id, title, description, dueDate, status }: Task) => ({
+      ({ id, title, description, dueDate, status, importance, urgency }: Task) => ({
         id,
         title,
         description,
         status,
         dueDate: new Date(dueDate),
         user,
+        importance,
+        urgency,
       }),
     );
     setTasks(updatedTasks ?? []);
-  }, [result, setTasks]);
+  }, [result, setTasks, user]);
 
   return (
     <TaskContext.Provider
