@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bomb, ListCheck } from "lucide-react";
+import { Bomb, ListCheck, LayoutGrid } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -28,19 +28,21 @@ const data = {
       title: "Tasks",
       url: "#",
       icon: ListCheck,
-      isActive: true,
       items: [
         {
           title: "All Tasks",
           url: "/",
-          isActive: true,
         },
         {
           title: "Completed Tasks",
           url: "/completed",
-          isActive: true,
         },
       ],
+    },
+    {
+      title: "Matrix View",
+      url: "/matrix",
+      icon: LayoutGrid,
     },
   ],
 };

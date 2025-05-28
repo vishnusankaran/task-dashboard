@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { toast } from "sonner";
 import { addNewTask } from "@/queries/tasks";
@@ -49,6 +50,8 @@ const formSchema = z.object({
     .optional(),
   status: statusEnum,
   dueDate: z.date(),
+  importance: z.boolean().optional(),
+  urgency: z.boolean().optional(),
 });
 
 export const AddForm = ({ onDone }: { onDone: (response: object) => void }) => {
@@ -59,6 +62,8 @@ export const AddForm = ({ onDone }: { onDone: (response: object) => void }) => {
       description: "",
       status: "pending",
       dueDate: new Date(),
+      importance: false,
+      urgency: false,
     },
   });
 
@@ -98,6 +103,42 @@ export const AddForm = ({ onDone }: { onDone: (response: object) => void }) => {
                 />
               </FormControl>
               <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="importance"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Important</FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="urgency"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Urgent</FormLabel>
+              </div>
             </FormItem>
           )}
         />

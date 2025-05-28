@@ -9,6 +9,8 @@ export const getAllTasks = gql`
       description
       status
       user
+      importance
+      urgency
     }
   }
 `;
@@ -22,6 +24,8 @@ export const addNewTask = gql`
       dueDate
       status
       user
+      importance
+      urgency
     }
   }
 `;
@@ -35,6 +39,8 @@ export const updateSingleTask = gql`
       dueDate
       status
       user
+      importance
+      urgency
     }
   }
 `;
