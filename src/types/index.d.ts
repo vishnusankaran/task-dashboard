@@ -16,6 +16,6 @@ export type Task = {
   dueDate: Date;
   status: StatusType;
   user: User;
-  importance: boolean;
-  urgency: boolean;
+  importance: string;
+  urgency: string;
 };
